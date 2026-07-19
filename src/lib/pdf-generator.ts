@@ -94,6 +94,11 @@ export function generatePdfReport(scanData: any) {
     { name: "Accessibility Compliance", score: scanData.scores.accessibility },
     { name: "Image Sizing & Formats", score: scanData.scores.images },
     { name: "Google PageSpeed Performance", score: scanData.scores.pagespeed },
+    { name: "QA Automation Test", score: scanData.scores.qa },
+    { name: "Competitor Benchmark", score: scanData.scores.benchmark },
+    { name: "App Cost Analyzer", score: scanData.scores.cost },
+    { name: "Conversion Rate Optimization (CRO)", score: scanData.scores.cro },
+    { name: "Speed Optimization Planner", score: scanData.scores.speedPlanner },
   ];
 
   modules.forEach(m => {

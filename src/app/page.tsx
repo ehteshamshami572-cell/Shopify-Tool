@@ -11,6 +11,12 @@ import ThemeView from "@/components/theme-view";
 import PageSpeedView from "@/components/pagespeed-view";
 import ImagesView from "@/components/images-view";
 import AccessibilityView from "@/components/accessibility-view";
+import QaView from "@/components/qa-view";
+import BenchmarkView from "@/components/benchmark-view";
+import AppCostView from "@/components/app-cost-view";
+import CroView from "@/components/cro-view";
+import SpeedPlannerView from "@/components/speed-planner-view";
+import HealthMonitorView from "@/components/health-monitor-view";
 import CsvConverterView from "@/components/csv-converter-view";
 import JsonFormatterView from "@/components/json-formatter-view";
 import LiquidFormatterView from "@/components/liquid-formatter-view";
@@ -38,6 +44,18 @@ export default function Home() {
         return <ImagesView />;
       case "accessibility":
         return <AccessibilityView />;
+      case "qa":
+        return <QaView />;
+      case "benchmark":
+        return <BenchmarkView />;
+      case "app_cost":
+        return <AppCostView />;
+      case "cro":
+        return <CroView />;
+      case "speed_planner":
+        return <SpeedPlannerView />;
+      case "health_monitor":
+        return <HealthMonitorView />;
       case "csv_converter":
         return <CsvConverterView />;
       case "json_formatter":
@@ -52,7 +70,7 @@ export default function Home() {
   };
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-slate-50 dark:bg-slate-950 font-sans">
+    <div className="flex h-screen w-screen overflow-hidden bg-[#050811] font-sans">
       {/* Collapsible Sidebar */}
       <Sidebar />
 
@@ -62,7 +80,7 @@ export default function Home() {
         <Navbar />
 
         {/* Dynamic Views Viewport */}
-        <main className="flex-1 overflow-y-auto p-6 bg-slate-50/50 dark:bg-slate-950/40 scrollbar-thin">
+        <main className="flex-1 overflow-y-auto p-8 bg-[#050811] scrollbar-thin">
           {renderView()}
         </main>
       </div>

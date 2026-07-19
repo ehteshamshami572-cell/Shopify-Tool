@@ -1,0 +1,42 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Store {
+  id           String        @id @default(uuid())
+  url          String        @unique
+  domain       String
+  cms          String        @default("shopify")
+  scans        Scan[]
+  healthAlerts HealthAlert[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+
+model Scan {
+  id                 String   @id @default(uuid())
+  storeId            String
+  store              Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  scores             Json     // Consolidated scores (seo, apps, theme, pagespeed, overall, etc.)
+  metadata           Json     // Theme name, description, title, detected apps list
+  modules            Json     // Individual analyzer outputs (seo, apps, theme, images, etc.)
+  allIssues          Json     // Flattened issues list
+  allRecommendations Json     // Flattened recommendations list
+  scannedAt          DateTime @default(now())
+}
+
+model HealthAlert {
+  id        String   @id @default(uuid())
+  storeId   String
+  store     Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  metric    String   // e.g. "performance", "broken_links"
+  severity  String   // e.g. "critical", "warning"
+  message   String
+  resolved  Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
