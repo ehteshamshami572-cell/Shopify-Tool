@@ -8,6 +8,7 @@ export interface ScanJob {
   url: string;
   status: "queued" | "active" | "completed" | "failed";
   progress: number;
+  error?: string;
 }
 
 const activeJobs = new Map<string, ScanJob>();
@@ -82,6 +83,7 @@ async function processScanJob(jobId: string) {
     console.log(`[Worker] Audit job ${jobId} completed successfully.`);
   } catch (err: any) {
     job.status = "failed";
+    job.error = err.message || "An unknown error occurred.";
     console.error(`[Worker] Audit job ${jobId} failed:`, err.message);
   }
 }

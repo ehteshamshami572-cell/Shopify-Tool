@@ -10,6 +10,13 @@ export async function orchestrateScan(targetUrl: string): Promise<AnalysisContex
     urlString = "https://" + urlString;
   }
 
+  try {
+    // Validate the URL before proceeding
+    new URL(urlString);
+  } catch (error) {
+    throw new Error(`Invalid URL provided: ${targetUrl}`);
+  }
+
   const parsedUrl = new URL(urlString);
   const domain = parsedUrl.hostname;
 
@@ -90,7 +97,9 @@ export async function orchestrateScan(targetUrl: string): Promise<AnalysisContex
       console.warn("Playwright browser fallback unavailable in serverless environment:", pwErr.message);
     } finally {
       if (browser) {
-        await browser.close().catch(() => {});
+        await browser.close().catch((err: any) => {
+          console.warn("Failed to close Playwright browser instance:", err.message);
+        });
       }
     }
   }

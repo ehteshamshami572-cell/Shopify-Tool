@@ -1,16 +1,26 @@
 let prismaClient: any = null;
 
 try {
-  // Dynamically require Prisma Client if available to prevent compilation blocks in environments without database packages
+  // Dynamically require Prisma Client to prevent compilation blocks in environments without database packages
   const { PrismaClient } = require("@prisma/client");
   
-  if (globalThis && !(globalThis as any).prisma) {
-    (globalThis as any).prisma = new PrismaClient();
+  // Check if the global instance exists, otherwise create it.
+  // This prevents re-creating the client on every hot-reload in development.
+  if (globalThis && !(globalThis as any).prisma) { 
+    try {
+      (globalThis as any).prisma = new PrismaClient();
+    } catch (initError: any) {
+      console.error("Prisma Client failed to initialize. Falling back to mock.", initError.message);
+    }
   }
   prismaClient = (globalThis as any).prisma;
 } catch (err) {
-  console.warn("Prisma Client not loaded in node_modules. Using modular mock database wrapper fallback.");
-  
+  // This catch block handles the case where `@prisma/client` is not installed at all.
+}
+
+// If prismaClient is still null (either not installed or failed to init), create the mock.
+if (!prismaClient) {
+  console.warn("Prisma Client not available. Using mock database wrapper fallback.");
   // High-fidelity fallback client matching the Postgres Prisma schema definitions
   prismaClient = {
     store: {
