@@ -12,18 +12,29 @@ import { AppCostAnalyzer } from "@/lib/analyzers/app-cost";
 import { CroAnalyzer } from "@/lib/analyzers/cro";
 import { SpeedOptimizationPlanner } from "@/lib/analyzers/speed-planner";
 
+// Vercel Serverless Function configuration
+export const maxDuration = 30;
+export const dynamic = "force-dynamic";
+
 export async function POST(request: Request) {
   try {
     const { url } = await request.json();
 
-    if (!url) {
-      return NextResponse.json({ error: "Store URL is required" }, { status: 400 });
+    if (!url || typeof url !== "string") {
+      return NextResponse.json({ error: "Store URL is required and must be a valid string" }, { status: 400 });
     }
 
     console.log(`Starting expanded Shopify scan for: ${url}`);
 
     // 1. Run Crawl & Parse Orchestration
     const context = await orchestrateScan(url);
+
+    if (!context || (!context.html && context.links.length === 0)) {
+      return NextResponse.json(
+        { error: "Could not reach target store URL. Make sure the domain is publicly accessible and online." },
+        { status: 400 }
+      );
+    }
 
     // 2. Run App detector and Theme intelligence first since context shopifyData is populated
     const appDetector = new AppDetector();

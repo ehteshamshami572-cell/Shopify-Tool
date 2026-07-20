@@ -1,6 +1,5 @@
 import axios from "axios";
 import * as cheerio from "cheerio";
-import { chromium } from "playwright";
 import { URL } from "url";
 import { AnalysisContext } from "@/types/scan";
 
@@ -25,7 +24,7 @@ export async function orchestrateScan(targetUrl: string): Promise<AnalysisContex
   const links: { href: string; text: string; external: boolean }[] = [];
   const rawNetworkRequests: { url: string; method: string; type: string }[] = [];
 
-  // 1. Fast Axios Fetch for HTML and Headers
+  // 1. Fast Axios Fetch for HTML and Headers (Vercel Serverless Compatible)
   try {
     const response = await axios.get(urlString, {
       headers: {
@@ -45,44 +44,50 @@ export async function orchestrateScan(targetUrl: string): Promise<AnalysisContex
     }
 
     // Map headers safely
-    for (const [key, value] of Object.entries(response.headers)) {
-      headers[key] = Array.isArray(value) ? value.join(", ") : String(value || "");
+    if (response.headers) {
+      for (const [key, value] of Object.entries(response.headers)) {
+        headers[key] = Array.isArray(value) ? value.join(", ") : String(value || "");
+      }
     }
   } catch (err: any) {
-    console.warn("Axios crawler failed, falling back to browser context:", err.message);
+    console.warn("Axios crawler failed, attempting browser context fallback:", err.message);
   }
 
-  // 2. Playwright crawler fallback (only if Axios failed or returned empty HTML)
+  // 2. Playwright crawler fallback (dynamically required for Vercel Serverless compatibility)
   if (!html || html.length < 500) {
     let browser: any = null;
     try {
-      browser = await chromium.launch({
-        headless: true,
-      });
-      const browserContext = await browser.newContext({
-        userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-      });
-      const page = await browserContext.newPage();
-
-      page.on("request", (req: any) => {
-        rawNetworkRequests.push({
-          url: req.url(),
-          method: req.method(),
-          type: req.resourceType(),
+      // Dynamic require to prevent Vercel serverless bundler crashes if Playwright binaries are absent
+      const pw = require("playwright");
+      if (pw && pw.chromium) {
+        browser = await pw.chromium.launch({
+          headless: true,
         });
-      });
+        const browserContext = await browser.newContext({
+          userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        });
+        const page = await browserContext.newPage();
 
-      await page.goto(urlString, {
-        waitUntil: "domcontentloaded",
-        timeout: 5000,
-      });
+        page.on("request", (req: any) => {
+          rawNetworkRequests.push({
+            url: req.url(),
+            method: req.method(),
+            type: req.resourceType(),
+          });
+        });
 
-      const renderedHtml = await page.content();
-      if (renderedHtml) {
-        html = renderedHtml;
+        await page.goto(urlString, {
+          waitUntil: "domcontentloaded",
+          timeout: 5000,
+        });
+
+        const renderedHtml = await page.content();
+        if (renderedHtml) {
+          html = renderedHtml;
+        }
       }
     } catch (pwErr: any) {
-      console.warn("Playwright crawler fallback active:", pwErr.message);
+      console.warn("Playwright browser fallback unavailable in serverless environment:", pwErr.message);
     } finally {
       if (browser) {
         await browser.close().catch(() => {});
