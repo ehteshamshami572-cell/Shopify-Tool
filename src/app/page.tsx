@@ -17,11 +17,12 @@ import AppCostView from "@/components/app-cost-view";
 import CroView from "@/components/cro-view";
 import SpeedPlannerView from "@/components/speed-planner-view";
 import HealthMonitorView from "@/components/health-monitor-view";
-import CsvConverterView from "@/components/csv-converter-view";
-import JsonFormatterView from "@/components/json-formatter-view";
-import LiquidFormatterView from "@/components/liquid-formatter-view";
 import DevToolboxView from "@/components/dev-toolbox-view";
+import ReportsView from "@/components/reports-view";
+import SettingsView from "@/components/settings-view";
+import { CommandPalette } from "@/components/common/CommandPalette";
 import { useScanStore } from "@/store/useScanStore";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function Home() {
   const activeView = useScanStore((state) => state.activeView);
@@ -56,21 +57,22 @@ export default function Home() {
         return <SpeedPlannerView />;
       case "health_monitor":
         return <HealthMonitorView />;
-      case "csv_converter":
-        return <CsvConverterView />;
-      case "json_formatter":
-        return <JsonFormatterView />;
-      case "liquid_formatter":
-        return <LiquidFormatterView />;
       case "dev_toolbox":
         return <DevToolboxView />;
+      case "reports":
+        return <ReportsView />;
+      case "settings":
+        return <SettingsView />;
       default:
         return <DashboardView />;
     }
   };
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-[#050811] font-sans">
+    <div className="flex h-screen w-screen overflow-hidden bg-[#09090B] font-sans">
+      {/* Global Command Palette */}
+      <CommandPalette />
+
       {/* Collapsible Sidebar */}
       <Sidebar />
 
@@ -79,9 +81,19 @@ export default function Home() {
         {/* Global Navigation Header */}
         <Navbar />
 
-        {/* Dynamic Views Viewport */}
-        <main className="flex-1 overflow-y-auto p-8 bg-[#050811] scrollbar-thin">
-          {renderView()}
+        {/* Dynamic Views Viewport with Framer Motion Page Transitions */}
+        <main className="flex-1 overflow-y-auto p-8 bg-[#09090B] scrollbar-thin">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeView}
+              initial={{ opacity: 0, y: 4 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -4 }}
+              transition={{ duration: 0.15 }}
+            >
+              {renderView()}
+            </motion.div>
+          </AnimatePresence>
         </main>
       </div>
     </div>

@@ -26,7 +26,8 @@ import {
   ChevronDown,
   User,
   Check,
-  TrendingUp,
+  Settings,
+  FileText,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
@@ -55,11 +56,12 @@ export default function Sidebar({ className }: SidebarProps) {
     {
       title: "ANALYZE & OPTIMIZE",
       items: [
+        { id: "scanner", label: "Store Scanner", icon: Search },
         { id: "qa", label: "QA Automation", icon: Play, requiresScan: true },
         { id: "benchmark", label: "Store Benchmark", icon: BarChart3, requiresScan: true },
-        { id: "app_cost", label: "App Cost Analysis", icon: DollarSign, requiresScan: true },
+        { id: "app_cost", label: "App Cost Analyzer", icon: DollarSign, requiresScan: true },
         { id: "seo", label: "SEO Manager", icon: Globe, requiresScan: true },
-        { id: "speed_planner", label: "Speed Optimization", icon: Zap, requiresScan: true },
+        { id: "speed_planner", label: "Speed Optimization Planner", icon: Zap, requiresScan: true },
         { id: "images", label: "Image Optimizer", icon: ImageIcon, requiresScan: true },
         { id: "cro", label: "CRO Analyzer", icon: Sparkles, requiresScan: true },
         { id: "apps", label: "App Detector", icon: Cpu, requiresScan: true },
@@ -73,9 +75,11 @@ export default function Sidebar({ className }: SidebarProps) {
       ]
     },
     {
-      title: "MONITOR & TRACK",
+      title: "MONITOR & MANAGEMENT",
       items: [
         { id: "health_monitor", label: "Store Health Monitor", icon: Activity },
+        { id: "reports", label: "Reports", icon: FileText },
+        { id: "settings", label: "Settings", icon: Settings },
       ]
     }
   ];
@@ -83,7 +87,7 @@ export default function Sidebar({ className }: SidebarProps) {
   return (
     <aside
       className={cn(
-        "relative flex flex-col border-r border-slate-800 bg-[#0B0F19] text-slate-100 transition-all duration-300 ease-in-out z-30 shrink-0 h-screen select-none",
+        "relative flex flex-col border-r border-slate-800 bg-[#09090B] text-slate-100 transition-all duration-300 ease-in-out z-30 shrink-0 h-screen select-none",
         collapsed ? "w-16" : "w-64",
         className
       )}
@@ -91,18 +95,18 @@ export default function Sidebar({ className }: SidebarProps) {
       {/* Top Header Logo */}
       <div className="flex h-16 items-center gap-2.5 px-5 border-b border-slate-900 shrink-0">
         <div className="flex items-center gap-2 font-bold text-sm text-slate-100">
-          <div className="p-1.5 bg-emerald-500 rounded-lg text-white font-black text-xs shadow-md shadow-emerald-500/20">
+          <div className="p-1.5 bg-indigo-600 rounded-lg text-white font-black text-xs shadow-md shadow-indigo-600/20">
             S
           </div>
           {!collapsed && (
-            <div className="flex flex-col">
+            <div className="flex flex-col text-left">
               <div className="flex items-center gap-1.5">
                 <span className="font-extrabold text-[13px] tracking-tight">Shopify Toolkit</span>
-                <Badge className="bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-[9px] px-1 py-0 rounded scale-90">
-                  Pro
+                <Badge className="bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-[9px] px-1 py-0 rounded">
+                  PRO
                 </Badge>
               </div>
-              <span className="text-[10px] text-slate-500 font-semibold tracking-wider uppercase">Developer & Merchant Suite</span>
+              <span className="text-[9px] text-slate-500 font-semibold tracking-wider uppercase">Enterprise Suite</span>
             </div>
           )}
         </div>
@@ -126,7 +130,7 @@ export default function Sidebar({ className }: SidebarProps) {
 
         {/* Sections loop */}
         {sections.map((section, idx) => (
-          <div key={idx} className="space-y-1.5">
+          <div key={idx} className="space-y-1.5 text-left">
             {!collapsed && (
               <span className="text-[9px] font-extrabold tracking-widest text-slate-500 block px-3">
                 {section.title}
@@ -136,7 +140,7 @@ export default function Sidebar({ className }: SidebarProps) {
               {section.items.map((item) => {
                 const Icon = item.icon;
                 const isActive = activeView === item.id;
-                const isDisabled = item.requiresScan && !hasScan;
+                const isDisabled = !!item.requiresScan && !hasScan;
 
                 return (
                   <button
@@ -163,60 +167,29 @@ export default function Sidebar({ className }: SidebarProps) {
             </div>
           </div>
         ))}
-
-        {/* Upgrade to Pro Card */}
-        {!collapsed && (
-          <div className="p-4 rounded-xl border border-indigo-500/20 bg-indigo-950/20 space-y-3 relative overflow-hidden mt-6 shadow-lg shadow-indigo-950/20">
-            <div className="absolute -right-3 -top-3 w-12 h-12 rounded-full bg-indigo-550/10 blur-xl pointer-events-none" />
-            <h4 className="text-xs font-extrabold text-white flex items-center gap-1.5">
-              <span>Upgrade to Pro</span>
-            </h4>
-            <ul className="space-y-1 text-[10px] text-slate-400">
-              <li className="flex items-center gap-1.5">
-                <Check className="h-3 w-3 text-emerald-400 shrink-0" />
-                <span>Unlimited Scans</span>
-              </li>
-              <li className="flex items-center gap-1.5">
-                <Check className="h-3 w-3 text-emerald-400 shrink-0" />
-                <span>Scheduled Monitoring</span>
-              </li>
-              <li className="flex items-center gap-1.5">
-                <Check className="h-3 w-3 text-emerald-400 shrink-0" />
-                <span>Advanced Reports</span>
-              </li>
-              <li className="flex items-center gap-1.5">
-                <Check className="h-3 w-3 text-emerald-400 shrink-0" />
-                <span>Priority Support</span>
-              </li>
-            </ul>
-            <button className="w-full h-8 rounded-lg bg-indigo-600 hover:bg-indigo-750 transition-colors text-[10px] font-extrabold text-white shadow-md shadow-indigo-600/10">
-              Upgrade Now 🚀
-            </button>
-          </div>
-        )}
       </div>
 
       {/* User profile footer block */}
-      <div className="p-3 border-t border-slate-900 shrink-0 space-y-2 bg-slate-950/40">
+      <div className="p-3 border-t border-slate-900 shrink-0 space-y-2 bg-[#09090B]">
         {!collapsed && (
-          <div className="flex items-center justify-between p-2 rounded-lg bg-slate-950/30 border border-slate-900">
+          <div className="flex items-center justify-between p-2 rounded-lg bg-slate-950/40 border border-slate-900">
             <div className="flex items-center gap-2">
-              <div className="p-1.5 bg-slate-800 text-slate-400 rounded-full border border-slate-700">
+              <div className="p-1.5 bg-slate-800 text-slate-300 rounded-full border border-slate-700">
                 <User className="h-3.5 w-3.5" />
               </div>
               <div className="flex flex-col text-left">
-                <span className="text-[11px] font-bold text-slate-200">John Developer</span>
-                <span className="text-[9px] text-slate-500 font-semibold uppercase">Pro Plan</span>
+                <span className="text-[11px] font-bold text-slate-200">Developer</span>
+                <span className="text-[9px] text-slate-500 font-semibold uppercase">Enterprise</span>
               </div>
             </div>
-            <ChevronDown className="h-3 w-3 text-slate-550 cursor-pointer" />
+            <ChevronDown className="h-3 w-3 text-slate-500 cursor-pointer" />
           </div>
         )}
 
         {/* Toggle Collapse button */}
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-xs font-semibold text-slate-500 hover:text-slate-350 transition-colors"
+          className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-xs font-semibold text-slate-500 hover:text-slate-300 transition-colors"
         >
           {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
           {!collapsed && <span>Collapse</span>}

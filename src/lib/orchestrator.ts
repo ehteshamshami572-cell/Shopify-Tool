@@ -25,7 +25,7 @@ export async function orchestrateScan(targetUrl: string): Promise<AnalysisContex
   const links: { href: string; text: string; external: boolean }[] = [];
   const rawNetworkRequests: { url: string; method: string; type: string }[] = [];
 
-  // 1. Axios Fetch for HTML and Headers
+  // 1. Fast Axios Fetch for HTML and Headers
   try {
     const response = await axios.get(urlString, {
       headers: {
@@ -33,59 +33,65 @@ export async function orchestrateScan(targetUrl: string): Promise<AnalysisContex
         "Accept-Language": "en-US,en;q=0.9",
         "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
       },
-      timeout: 10000,
+      timeout: 8000,
+      maxRedirects: 5,
       validateStatus: () => true,
     });
 
-    html = response.data;
-    // Map headers to string values
+    if (typeof response.data === "string") {
+      html = response.data;
+    } else if (Buffer.isBuffer(response.data)) {
+      html = response.data.toString("utf-8");
+    }
+
+    // Map headers safely
     for (const [key, value] of Object.entries(response.headers)) {
-      headers[key] = Array.isArray(value) ? value.join(", ") : value || "";
+      headers[key] = Array.isArray(value) ? value.join(", ") : String(value || "");
     }
   } catch (err: any) {
-    console.error("Axios crawler failed, attempting fallback:", err.message);
+    console.warn("Axios crawler failed, falling back to browser context:", err.message);
   }
 
-  // 2. Playwright crawler for rendering and network requests
-  let playwrightSuccess = false;
-  try {
-    const browser = await chromium.launch({
-      headless: true,
-    });
-    const browserContext = await browser.newContext({
-      userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) ShopifyScan/1.0",
-    });
-    const page = await browserContext.newPage();
-
-    // Track network requests
-    page.on("request", (req) => {
-      rawNetworkRequests.push({
-        url: req.url(),
-        method: req.method(),
-        type: req.resourceType(),
+  // 2. Playwright crawler fallback (only if Axios failed or returned empty HTML)
+  if (!html || html.length < 500) {
+    let browser: any = null;
+    try {
+      browser = await chromium.launch({
+        headless: true,
       });
-    });
+      const browserContext = await browser.newContext({
+        userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+      });
+      const page = await browserContext.newPage();
 
-    // Go to URL
-    await page.goto(urlString, {
-      waitUntil: "networkidle",
-      timeout: 15000,
-    });
+      page.on("request", (req: any) => {
+        rawNetworkRequests.push({
+          url: req.url(),
+          method: req.method(),
+          type: req.resourceType(),
+        });
+      });
 
-    // Retrieve rendered HTML
-    const renderedHtml = await page.content();
-    if (renderedHtml) {
-      html = renderedHtml;
-      playwrightSuccess = true;
+      await page.goto(urlString, {
+        waitUntil: "domcontentloaded",
+        timeout: 5000,
+      });
+
+      const renderedHtml = await page.content();
+      if (renderedHtml) {
+        html = renderedHtml;
+      }
+    } catch (pwErr: any) {
+      console.warn("Playwright crawler fallback active:", pwErr.message);
+    } finally {
+      if (browser) {
+        await browser.close().catch(() => {});
+      }
     }
-
-    await browser.close();
-  } catch (pwErr: any) {
-    console.warn("Playwright crawler unavailable (likely missing browser binaries). Using Axios + Cheerio fallback.", pwErr.message);
   }
 
   // 3. Cheerio Parsing
-  if (html) {
+  if (html && typeof html === "string") {
     const $ = cheerio.load(html);
 
     // Title
@@ -143,7 +149,7 @@ export async function orchestrateScan(targetUrl: string): Promise<AnalysisContex
       const href = $(el).attr("href") || "";
       const text = $(el).text().replace(/\s+/g, " ").trim();
       if (href) {
-        const isExternal = href.startsWith("http://") || href.startsWith("https://") && !href.includes(domain);
+        const isExternal = href.startsWith("http://") || (href.startsWith("https://") && !href.includes(domain));
         links.push({
           href,
           text,
@@ -163,7 +169,7 @@ export async function orchestrateScan(targetUrl: string): Promise<AnalysisContex
   let themeName: string | undefined;
   let themeId: string | undefined;
 
-  if (isShopify && html) {
+  if (isShopify && html && typeof html === "string") {
     // Attempt theme name detection via Shopify global JS configuration block
     const themeMatch = html.match(/"themeName"\s*:\s*"([^"]+)"/);
     if (themeMatch && themeMatch[1]) {
@@ -186,7 +192,7 @@ export async function orchestrateScan(targetUrl: string): Promise<AnalysisContex
   return {
     url: urlString,
     domain,
-    html,
+    html: html || "",
     headers,
     title,
     meta,

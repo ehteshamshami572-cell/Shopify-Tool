@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useScanStore } from "@/store/useScanStore";
-import { Bell, Moon, Sun, ArrowRight, Activity, ShieldCheck, Sparkles } from "lucide-react";
+import { Bell, Moon, Sun, ArrowRight, Activity, ShieldCheck, Search, Command } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 export default function Navbar() {
@@ -10,59 +10,72 @@ export default function Navbar() {
   const activeView = useScanStore((state) => state.activeView);
   const setActiveView = useScanStore((state) => state.setActiveView);
 
+  const getTitle = () => {
+    switch (activeView) {
+      case "dashboard": return "Dashboard";
+      case "scanner": return "Store Auditor Engine";
+      case "seo": return "SEO Manager";
+      case "apps": return "App Detector";
+      case "theme": return "Theme Intelligence";
+      case "pagespeed": return "PageSpeed Metrics";
+      case "images": return "Image Optimizer";
+      case "accessibility": return "Accessibility Analyzer";
+      case "qa": return "QA Automation";
+      case "benchmark": return "Store Benchmark";
+      case "app_cost": return "App Cost Analyzer";
+      case "cro": return "CRO Analyzer";
+      case "speed_planner": return "Speed Optimization Planner";
+      case "health_monitor": return "Store Health Monitor";
+      case "dev_toolbox": return "Developer Toolbox";
+      case "reports": return "Executive Reports";
+      case "settings": return "Settings";
+      default: return "Shopify Toolkit";
+    }
+  };
+
   return (
-    <header className="flex h-20 w-full items-center justify-between px-8 border-b border-slate-900 bg-[#0B0F19] text-slate-100 sticky top-0 z-20 select-none">
-      {/* Greetings Block */}
-      <div className="flex flex-col text-left">
-        <h1 className="text-base font-extrabold text-slate-100 flex items-center gap-1.5 leading-tight">
-          <span>Welcome back, John!</span>
-          <span>👋</span>
-        </h1>
-        <p className="text-[10px] text-slate-500 font-semibold tracking-wide uppercase mt-0.5">
-          Here's what's happening with your store performance.
-        </p>
+    <header className="flex h-16 w-full items-center justify-between px-6 border-b border-slate-800 bg-[#09090B] text-slate-100 sticky top-0 z-20 select-none">
+      {/* Breadcrumb / Title */}
+      <div className="flex items-center gap-2 text-left">
+        <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Suite</span>
+        <span className="text-slate-700">/</span>
+        <h1 className="text-sm font-extrabold text-slate-100">{getTitle()}</h1>
+        
+        {currentScan && (
+          <div className="hidden lg:flex items-center gap-2 border border-slate-800 bg-slate-950/40 px-2.5 py-1 rounded-lg text-xs ml-3">
+            <Activity className="h-3 w-3 text-emerald-400 animate-pulse" />
+            <span className="font-bold text-slate-300 text-[11px]">{currentScan.domain}</span>
+          </div>
+        )}
       </div>
 
       {/* Right Controls Block */}
-      <div className="flex items-center gap-4.5">
-        {/* Scanned domain info if exists */}
-        {currentScan && (
-          <div className="hidden lg:flex items-center gap-2 border border-slate-800 bg-slate-950/40 px-3 py-1.5 rounded-lg text-xs">
-            <Activity className="h-3.5 w-3.5 text-emerald-400 animate-pulse" />
-            <span className="font-bold text-slate-300">{currentScan.domain}</span>
-            {currentScan.isShopify && (
-              <Badge className="bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 border border-emerald-500/20 text-[9px] font-extrabold px-1.5 py-0.5 rounded">
-                SHOPIFY VERIFIED
-              </Badge>
-            )}
-          </div>
-        )}
+      <div className="flex items-center gap-3">
+        {/* Command Palette Trigger */}
+        <button
+          onClick={() => {
+            const event = new KeyboardEvent("keydown", { key: "k", metaKey: true });
+            document.dispatchEvent(event);
+          }}
+          className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-400 bg-slate-950 border border-slate-800 hover:border-slate-700 hover:text-slate-200 transition-colors"
+        >
+          <Search className="h-3.5 w-3.5 text-slate-500" />
+          <span className="text-[11px]">Search commands...</span>
+          <kbd className="font-mono text-[9px] bg-slate-900 border border-slate-800 px-1.5 py-0.5 rounded text-slate-400">⌘K</kbd>
+        </button>
 
-        {/* New Scan button */}
+        {/* Quick Scan action */}
         <button
           onClick={() => setActiveView("scanner")}
-          className="flex items-center gap-1.5 px-4.5 py-2 rounded-lg text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 shadow-md shadow-indigo-600/15 transition-all cursor-pointer"
+          className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 shadow-md shadow-indigo-600/15 transition-all"
         >
           <span>New Scan</span>
           <ArrowRight className="h-3.5 w-3.5" />
         </button>
 
-        {/* Theme mode toggle mock */}
-        <button className="p-2 text-slate-400 hover:text-slate-200 bg-slate-950/20 border border-slate-900 rounded-lg transition-colors cursor-pointer">
-          <Moon className="h-4 w-4" />
-        </button>
-
-        {/* Notification bell mock */}
-        <button className="relative p-2 text-slate-400 hover:text-slate-200 bg-slate-950/20 border border-slate-900 rounded-lg transition-colors cursor-pointer">
-          <Bell className="h-4 w-4" />
-          <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-rose-500 text-[8px] font-black text-white">
-            3
-          </span>
-        </button>
-
-        {/* User profile bubble mock */}
-        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-600/20 border border-indigo-500/30 text-indigo-400 font-extrabold text-xs shadow-md shadow-indigo-600/10">
-          JD
+        {/* User profile bubble */}
+        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-600/20 border border-indigo-500/30 text-indigo-400 font-extrabold text-xs">
+          ST
         </div>
       </div>
     </header>
