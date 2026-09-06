@@ -20,6 +20,7 @@ import HealthMonitorView from "@/components/health-monitor-view";
 import DevToolboxView from "@/components/dev-toolbox-view";
 import ReportsView from "@/components/reports-view";
 import SettingsView from "@/components/settings-view";
+import LandingView from "@/components/landing-view";
 import { CommandPalette } from "@/components/common/CommandPalette";
 import { useScanStore } from "@/store/useScanStore";
 import { motion, AnimatePresence } from "framer-motion";
@@ -29,6 +30,8 @@ export default function Home() {
 
   const renderView = () => {
     switch (activeView) {
+      case "landing":
+        return <LandingView />;
       case "dashboard":
         return <DashboardView />;
       case "scanner":
@@ -64,12 +67,31 @@ export default function Home() {
       case "settings":
         return <SettingsView />;
       default:
-        return <DashboardView />;
+        return <LandingView />;
     }
   };
 
+  // If the active view is the landing page, render it full screen without sidebar/headers
+  if (activeView === "landing") {
+    return (
+      <div className="bg-[#f8fafc] min-h-screen w-screen overflow-x-hidden">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key="landing"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            <LandingView />
+          </motion.div>
+        </AnimatePresence>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-[#09090B] font-sans">
+    <div className="flex h-screen w-screen overflow-hidden bg-[#f8fafc] font-sans">
       {/* Global Command Palette */}
       <CommandPalette />
 
@@ -82,7 +104,7 @@ export default function Home() {
         <Navbar />
 
         {/* Dynamic Views Viewport with Framer Motion Page Transitions */}
-        <main className="flex-1 overflow-y-auto p-8 bg-[#09090B] scrollbar-thin">
+        <main className="flex-1 overflow-y-auto p-8 bg-[#f8fafc] scrollbar-thin">
           <AnimatePresence mode="wait">
             <motion.div
               key={activeView}

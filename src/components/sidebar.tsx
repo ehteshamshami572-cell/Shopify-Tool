@@ -87,26 +87,29 @@ export default function Sidebar({ className }: SidebarProps) {
   return (
     <aside
       className={cn(
-        "relative flex flex-col border-r border-slate-800 bg-[#09090B] text-slate-100 transition-all duration-300 ease-in-out z-30 shrink-0 h-screen select-none",
+        "relative flex flex-col border-r border-slate-200 bg-white text-slate-800 transition-all duration-300 ease-in-out z-30 shrink-0 h-screen select-none",
         collapsed ? "w-16" : "w-64",
         className
       )}
     >
       {/* Top Header Logo */}
-      <div className="flex h-16 items-center gap-2.5 px-5 border-b border-slate-900 shrink-0">
-        <div className="flex items-center gap-2 font-bold text-sm text-slate-100">
+      <div className="flex h-16 items-center gap-2.5 px-5 border-b border-slate-100 shrink-0">
+        <div
+          onClick={() => setActiveView("landing")}
+          className="flex items-center gap-2 font-bold text-sm text-slate-800 cursor-pointer hover:opacity-85 transition-opacity"
+        >
           <div className="p-1.5 bg-indigo-600 rounded-lg text-white font-black text-xs shadow-md shadow-indigo-600/20">
             S
           </div>
           {!collapsed && (
             <div className="flex flex-col text-left">
               <div className="flex items-center gap-1.5">
-                <span className="font-extrabold text-[13px] tracking-tight">Shopify Toolkit</span>
-                <Badge className="bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-[9px] px-1 py-0 rounded">
+                <span className="font-extrabold text-sm tracking-tight text-slate-900">Shopify Toolkit</span>
+                <Badge className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-[10px] px-1.5 py-0.5 rounded">
                   PRO
                 </Badge>
               </div>
-              <span className="text-[9px] text-slate-500 font-semibold tracking-wider uppercase">Enterprise Suite</span>
+              <span className="text-[11px] text-slate-500 font-medium tracking-wide uppercase">Enterprise Suite</span>
             </div>
           )}
         </div>
@@ -118,10 +121,10 @@ export default function Sidebar({ className }: SidebarProps) {
         <button
           onClick={() => setActiveView("dashboard")}
           className={cn(
-            "flex w-full items-center gap-3 rounded-lg px-3 py-2 text-xs font-semibold transition-all group",
+            "flex w-full items-center gap-3 rounded-lg px-3 py-2 text-[13px] font-medium transition-all group",
             activeView === "dashboard"
               ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/10"
-              : "text-slate-400 hover:bg-slate-900 hover:text-slate-200"
+              : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
           )}
         >
           <LayoutDashboard className="h-4 w-4 shrink-0" />
@@ -132,7 +135,7 @@ export default function Sidebar({ className }: SidebarProps) {
         {sections.map((section, idx) => (
           <div key={idx} className="space-y-1.5 text-left">
             {!collapsed && (
-              <span className="text-[9px] font-extrabold tracking-widest text-slate-500 block px-3">
+              <span className="text-[11px] font-bold tracking-wider text-slate-400 block px-3 uppercase">
                 {section.title}
               </span>
             )}
@@ -148,11 +151,11 @@ export default function Sidebar({ className }: SidebarProps) {
                     disabled={isDisabled}
                     onClick={() => setActiveView(item.id)}
                     className={cn(
-                      "flex w-full items-center gap-3 rounded-lg px-3 py-2 text-xs font-semibold transition-all group relative",
+                      "flex w-full items-center gap-3 rounded-lg px-3 py-2 text-[13px] font-medium transition-all group relative",
                       isActive
                         ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/10"
-                        : "text-slate-400 hover:bg-slate-900 hover:text-slate-200",
-                      isDisabled && "opacity-35 cursor-not-allowed hover:bg-transparent hover:text-slate-400"
+                        : "text-slate-600 hover:bg-slate-100 hover:text-slate-900",
+                      isDisabled && "opacity-40 cursor-not-allowed hover:bg-transparent hover:text-slate-400"
                     )}
                     title={isDisabled ? "Scan a store first to unlock this analyzer" : item.label}
                   >
@@ -170,16 +173,16 @@ export default function Sidebar({ className }: SidebarProps) {
       </div>
 
       {/* User profile footer block */}
-      <div className="p-3 border-t border-slate-900 shrink-0 space-y-2 bg-[#09090B]">
+      <div className="p-3 border-t border-slate-100 shrink-0 space-y-2 bg-white">
         {!collapsed && (
-          <div className="flex items-center justify-between p-2 rounded-lg bg-slate-950/40 border border-slate-900">
+          <div className="flex items-center justify-between p-2 rounded-lg bg-slate-50 border border-slate-150">
             <div className="flex items-center gap-2">
-              <div className="p-1.5 bg-slate-800 text-slate-300 rounded-full border border-slate-700">
+              <div className="p-1.5 bg-slate-100 text-slate-655 rounded-full border border-slate-200">
                 <User className="h-3.5 w-3.5" />
               </div>
               <div className="flex flex-col text-left">
-                <span className="text-[11px] font-bold text-slate-200">Developer</span>
-                <span className="text-[9px] text-slate-500 font-semibold uppercase">Enterprise</span>
+                <span className="text-xs font-bold text-slate-900">Developer</span>
+                <span className="text-[11px] text-slate-500 font-medium uppercase">Enterprise</span>
               </div>
             </div>
             <ChevronDown className="h-3 w-3 text-slate-500 cursor-pointer" />

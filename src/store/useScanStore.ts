@@ -16,6 +16,7 @@ interface ScanState {
   isScanning: boolean;
   scanningError: string | null;
   activeView: string;
+  prefilledUrl: string;
   
   // Actions
   setCurrentScan: (scan: any) => void;
@@ -24,6 +25,7 @@ interface ScanState {
   setScanning: (isScanning: boolean) => void;
   setScanningError: (error: string | null) => void;
   setActiveView: (view: string) => void;
+  setPrefilledUrl: (url: string) => void;
 }
 
 export const useScanStore = create<ScanState>()(
@@ -33,7 +35,8 @@ export const useScanStore = create<ScanState>()(
       recentScans: [],
       isScanning: false,
       scanningError: null,
-      activeView: "dashboard",
+      activeView: "landing",
+      prefilledUrl: "",
 
       setCurrentScan: (scan) => set({ currentScan: scan }),
       
@@ -50,13 +53,14 @@ export const useScanStore = create<ScanState>()(
       setScanning: (isScanning) => set({ isScanning }),
       setScanningError: (error) => set({ scanningError: error }),
       setActiveView: (view) => set({ activeView: view }),
+      setPrefilledUrl: (url) => set({ prefilledUrl: url }),
     }),
     {
       name: "shopify-toolkit-storage",
       partialize: (state) => ({
         recentScans: state.recentScans,
         currentScan: state.currentScan,
-        activeView: state.activeView,
+        // Exclude activeView and prefilledUrl from localStorage persistence
       }),
     }
   )

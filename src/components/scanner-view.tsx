@@ -35,6 +35,16 @@ export default function ScannerView() {
   const scanningError = useScanStore((state) => state.scanningError);
   const setScanningError = useScanStore((state) => state.setScanningError);
   const setActiveView = useScanStore((state) => state.setActiveView);
+  const prefilledUrl = useScanStore((state) => state.prefilledUrl);
+  const setPrefilledUrl = useScanStore((state) => state.setPrefilledUrl);
+
+  useEffect(() => {
+    if (prefilledUrl) {
+      setUrlInput(prefilledUrl);
+      scanMutation.mutate(prefilledUrl);
+      setPrefilledUrl("");
+    }
+  }, [prefilledUrl]);
 
   const steps = [
     { label: "Contacting host server & parsing DOM tree...", icon: Globe },
