@@ -21,6 +21,7 @@ import DevToolboxView from "@/components/dev-toolbox-view";
 import ReportsView from "@/components/reports-view";
 import SettingsView from "@/components/settings-view";
 import LandingView from "@/components/landing-view";
+import { AuditDashboard } from "@/components/shopify-audit/AuditDashboard";
 import { CommandPalette } from "@/components/common/CommandPalette";
 import { useScanStore } from "@/store/useScanStore";
 import { motion, AnimatePresence } from "framer-motion";
@@ -32,6 +33,8 @@ export default function Home() {
     switch (activeView) {
       case "landing":
         return <LandingView />;
+      case "shopify_audit":
+        return <AuditDashboard />;
       case "dashboard":
         return <DashboardView />;
       case "scanner":

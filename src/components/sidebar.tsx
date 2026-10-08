@@ -56,6 +56,7 @@ export default function Sidebar({ className }: SidebarProps) {
     {
       title: "ANALYZE & OPTIMIZE",
       items: [
+        { id: "shopify_audit", label: "Shopify Store Audit", icon: Sparkles },
         { id: "scanner", label: "Store Scanner", icon: Search },
         { id: "qa", label: "QA Automation", icon: Play, requiresScan: true },
         { id: "benchmark", label: "Store Benchmark", icon: BarChart3, requiresScan: true },
